@@ -8,6 +8,8 @@ import { serverUrl } from "../App.jsx"
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../../firebase.js';
 import { ClipLoader } from 'react-spinners';
+import { useDispatch } from 'react-redux';
+import { setUserData } from '../redux/userSlice.js';
 
 function SignUp() {
     const primaryColor = "#ff4d2d";
@@ -23,6 +25,7 @@ function SignUp() {
     const [mobile, setMobile] = useState("")
     const [err, setErr] = useState("")
     const navigate = useNavigate()
+    const dispatch = useDispatch()
 
     const handleSignUp = async () => {
         setLoading(true)
@@ -30,7 +33,7 @@ function SignUp() {
             const result = await axios.post(`${serverUrl}/api/auth/signup`, {
                 fullName, email, password, mobile, role
             }, { withCredentials: true })
-            console.log(result)
+            dispatch(setUserData(result.data))
             setErr("")
             setLoading(false)
         } catch (error) {
@@ -52,7 +55,7 @@ function SignUp() {
                 role,
                 mobile
             }, { withCredentials: true })
-            console.log(data)
+            dispatch(setUserData(data))
         } catch (error) {
             console.log(error)
         }
@@ -111,7 +114,7 @@ function SignUp() {
                     </div>
                 </div>
                 <button className={`w-full font-semibold py-2 rounded-lg transition duration-200 bg-[#ff4d2d] text-white hover:bg-[#e64323] cursor-pointer`} onClick={handleSignUp} disabled={loading}>
-                    {loading ? <ClipLoader color='white' size={20}/>  : "Sign Up"}
+                    {loading ? <ClipLoader color='white' size={20} /> : "Sign Up"}
                 </button>
                 {err && <p className='text-red-500 text-center my-[10px]'>*{err}</p>}
 

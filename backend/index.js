@@ -4,6 +4,7 @@ import connectDb from "./config/db.js"
 import cookieParser from "cookie-parser"
 import authRouter from "./routes/auth.routes.js"
 import cors from "cors"
+import userRouter from "./routes/user.routes.js"
 
 dotenv.config()
 
@@ -17,15 +18,9 @@ app.use(cors({
 app.use(express.json())
 app.use(cookieParser())
 app.use("/api/auth", authRouter)
-app.use("/api/auth", authRouter)
+app.use("/api/user", userRouter)
 
 app.listen(port, () => {
     connectDb()
     console.log(`server started at ${port}`)
 })
-
-app.get("/api/message", (req, res) => {
-  res.json({
-    message: "Hello from the backend!"
-  });
-});

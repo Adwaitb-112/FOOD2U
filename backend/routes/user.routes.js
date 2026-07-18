@@ -1,9 +1,9 @@
 import express from "express"
-import { getCurrentUser } from "../controllers/user.controllers"
-import isAuth from "../middlewares/isAuth"
+import { getCurrentUser } from "../controllers/user.controllers.js"
+import isAuth from "../middlewares/isAuth.js"
 
 const userRouter = express.Router()
 
-authRouter.get("/current",isAuth, getCurrentUser)
+userRouter.get("/current",isAuth, getCurrentUser)
 
 export default userRouter
