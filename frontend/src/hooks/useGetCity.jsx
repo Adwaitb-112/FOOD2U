@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import axios from "axios"
 import { useDispatch } from 'react-redux'
 import { useSelector } from 'react-redux'
-import { setCity } from '../redux/userSlice.js';
+import { setCurrentAddress, setCurrentCity, setCurrentState } from '../redux/userSlice.js';
 
 function useGetCity() {
     const dispatch = useDispatch()
@@ -12,12 +12,13 @@ function useGetCity() {
 
     useEffect(() => {
         navigator.geolocation.getCurrentPosition(async (position) => {
-            console.log(position)
             const latitude = position.coords.latitude
             const longitude = position.coords.longitude
             const res = await axios.get(`https://api.geoapify.com/v1/geocode/reverse?lat=${latitude}&lon=${longitude}&format=json&apiKey=${apiKey}`)
             // console.log(res.data.results[0].district)
-            dispatch(setCity(res?.data?.results[0].district))
+            dispatch(setCurrentCity(res?.data?.results[0].district))
+            dispatch(setCurrentState(res?.data?.results[0].state))
+            dispatch(setCurrentAddress(res?.data?.results[0].address_line2 || res?.data?.results[0].address_line1))
         })
     }, [])
 }
