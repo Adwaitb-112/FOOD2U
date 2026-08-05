@@ -6,9 +6,10 @@ export const createAndEditShop = async (req, res) => {
         const { name, city, state, address } = req.body
         let image;
         if (req.file) {
+            console.log(req.file)
             image = await uploadOnCloudinary(req.file.path)
         }
-        let shop = Shop.findOne({ owner: req.userId })
+        let shop = await Shop.findOne({ owner: req.userId })
         if (!shop) {
             shop = await Shop.create({
                 name, city, state, address, image, owner: req.userId
@@ -19,7 +20,7 @@ export const createAndEditShop = async (req, res) => {
             }, { new: true })
         }
 
-        await shop.populate("owner")
+        await shop.populate("owner items")
         return res.status(201).json(shop)
 
     } catch (error) {
@@ -30,10 +31,13 @@ export const createAndEditShop = async (req, res) => {
 
 export const getMyShop = async (req, res) => {
     try {
-        let shop = Shop.findOne({ owner: req.userId }).populate("owner items")
+        let shop = Shop.findOne({ owner: req.userId }).populate("owner").populate({
+            path: "items",
+            options: { sort: { updatedAt: -1 } }
+        })
         if (!shop) {
             return null
-        } 
+        }
         return res.status(201).json(shop)
 
     } catch (error) {

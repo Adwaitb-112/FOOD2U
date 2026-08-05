@@ -4,6 +4,7 @@ import axios from "axios"
 import { serverUrl } from "../App.jsx"
 import { useDispatch } from 'react-redux'
 import { setUserData } from '../redux/userSlice.js';
+import { setMyShopData } from '../redux/ownerSlice';
 
 function useGetMyShop() {
     const dispatch = useDispatch()
