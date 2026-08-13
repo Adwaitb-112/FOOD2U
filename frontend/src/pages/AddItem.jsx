@@ -8,7 +8,6 @@ import { serverUrl } from '../App';
 import { setMyShopData } from '../redux/ownerSlice';
 import { ClipLoader } from 'react-spinners';
 
-
 function AddItem() {
 
     const navigate = useNavigate()

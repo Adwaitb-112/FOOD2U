@@ -18,7 +18,9 @@ function Nav() {
     const [showInfo, setShowInfo] = useState(false)
     const [showSearch, setShowSearch] = useState(false)
     const dispatch = useDispatch()
-        const navigate = useNavigate()
+    const navigate = useNavigate()
+    const { cartItems } = useSelector(state => state.user)
+
 
     const handleLogOut = async () => {
         try {
@@ -79,9 +81,9 @@ function Nav() {
                         <span className='absolute -right-2 -top-2 text-xs font-bold text-white bg-[#ff4d2d] rounded-full px-[6px] py-[1px]'>0</span>
                     </div>
                 </> : (<>
-                    <div className='relative cursor-pointer'>
+                    <div className='relative cursor-pointer' onClick={() => navigate("/cart")}>
                         <GrCart className='text-[#ff4d2d]' size={25} />
-                        <span className='absolute text-[#ff4d2d] right-[-9px] top-[-12px]'>0</span>
+                        <span className='absolute text-[#ff4d2d] right-[-9px] top-[-12px]'>{cartItems.length}</span>
                     </div>
 
                     <button className='hidden md:block px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] text-sm font-medium'>

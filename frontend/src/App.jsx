@@ -11,13 +11,19 @@ import useGetMyShop from './hooks/useGetMyShop'
 import CreateEditShop from './pages/CreateEditShop'
 import AddItem from './pages/AddItem'
 import EditItems from './pages/EditItems'
+import useGetShopByCity from './hooks/useGetShopByCity'
+import useGetItemsByCity from './hooks/useGetItemsByCity'
+import CartPage from './pages/CartPage'
+import CheckOut from './pages/CheckOut'
 
 export const serverUrl = "http://localhost:8000"
 
 function App() {
   useGetCurrentUser()
   useGetCity()
-  useGetMyShop
+  useGetMyShop()
+  useGetShopByCity()
+  useGetItemsByCity()
   const { userData } = useSelector(state => state.user)
 
   return (
@@ -26,6 +32,8 @@ function App() {
       <Route path="/signin" element={!userData ? <SignIn /> : <Navigate to={"/"} />} />
       <Route path="/forgot-password" element={!userData ? <ForgotPassword /> : <Navigate to={"/"} />} />
       <Route path="/create-edit-shop" element={userData ? <CreateEditShop /> : <Navigate to={"/signin"} />} />
+      <Route path="/cart" element={userData ? <CartPage /> : <Navigate to={"/signin"} />} />
+      <Route path="/checkout" element={userData ? <CheckOut /> : <Navigate to={"/signin"} />} />
       <Route path="/add-item" element={userData ? <AddItem /> : <Navigate to={"/signin"} />} />
       <Route path="/edit-item/:itemId" element={userData ? <EditItems /> : <Navigate to={"/signin"} />} />
       <Route path="/" element={userData ? <Home /> : <Navigate to={"signin"} />} />
