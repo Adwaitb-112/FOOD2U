@@ -11,7 +11,6 @@ function OwnerDashboard() {
   const { myShopData } = useSelector(state => state.owner)
   const navigate = useNavigate()
 
-  console.log(myShopData)
   return (
     <div className='flex items-center flex-col w-full min-h-screen bg-[#fff9f6]'>
       <Nav />

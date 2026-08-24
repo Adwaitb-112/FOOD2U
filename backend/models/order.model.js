@@ -3,15 +3,17 @@ import mongoose from "mongoose";
 const shopOrderItemSchema = new mongoose.Schema({
     item: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Item"
+        ref: "Item",
+        required: true
     },
     price: Number,
-    quantity: Number
+    quantity: Number,
+    name: String
 
 }, { timestamps: true })
 
 const shopOrderSchema = new mongoose.Schema({
-    user: {
+    shop: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Shop"
     },
@@ -20,7 +22,21 @@ const shopOrderSchema = new mongoose.Schema({
         ref: "User"
     },
     subtotal: Number,
-    shopOrderItems: [shopOrderItemSchema]
+    shopOrderItems: [shopOrderItemSchema],
+    status: {
+        type: String,
+        enum: ["pending", "preparing", "out for delivery", "delivered"],
+        default: "pending"
+    },
+    assignment: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "DeliveryAssignment",
+        default: null
+    },
+    assignedDeliveryBoy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }
 
 }, { timestamps: true })
 
@@ -35,14 +51,28 @@ const orderSchema = new mongoose.Schema({
         required: true
     },
     deliveryAddress: {
-        type: String,
-        latitude: Number,
-        longitude: Number
+        text: {
+            type: String,
+            required: true
+        },
+        latitude: {
+            type: Number,
+            required: true
+        },
+        longitude: {
+            type: Number,
+            required: true
+        }
     },
+    // deliveryAddress: {
+    //     type: String,
+    //     latitude: Number,
+    //     longitude: Number
+    // },
     totalAmount: {
         type: Number
     },
-    shopOrder: [shopOrderSchema]
+    shopOrders: [shopOrderSchema]
 
 }, { timestamps: true })
 

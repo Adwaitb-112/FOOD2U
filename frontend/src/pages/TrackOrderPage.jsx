@@ -1,0 +1,68 @@
+import React, { useEffect, useState } from 'react'
+import { serverUrl } from '../App'
+import axios from 'axios'
+import { useNavigate, useParams } from 'react-router-dom'
+import { MdArrowBackIos } from 'react-icons/md'
+import DeliveryBoyTracking from '../components/DeliveryBoyTracking'
+
+function TrackOrderPage() {
+
+    const { orderId } = useParams()
+    const [currentOrder, setCurrentOrder] = useState()
+    const navigate = useNavigate()
+
+    const getOrderById = async () => {
+        try {
+            const result = await axios.get(`${serverUrl}/api/order/get-order-by-id/${orderId}`, { withCredentials: true })
+            setCurrentOrder(result.data)
+            console.log(result.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        getOrderById()
+    }, [orderId])
+
+    return (
+        <div className='max-w-4xl mx-auto p-4 flex flex-col gap-6'>
+            <div className='relative gap-4 flex items-center top-[20px] left-[20px] z-[10] mb-[10px]' onClick={() => navigate("/")}>
+                <MdArrowBackIos size={35} className='text-[#ff4d2d]' />
+                <h1 className='font-bold text-start text-2xl'>Track Order</h1>
+            </div>
+            {currentOrder?.shopOrders?.map((shopOrder, index) => (
+                <div className='bg-white p-4 rounded-2xl shadow-md border border-orange-100 space-y-4' key={index}>
+                    <div>
+                        <p className='font-bold text-lg text-[#ff4d2d] mb-2'>{shopOrder.shop.name}</p>
+                        <p className='font-bold'><span>Items:</span> {shopOrder.shopOrderItems?.map(i => i.name).join(", ")}</p>
+                        <p><span className='font-semibold'>Subtotal:</span> {shopOrder.subtotal}</p>
+                        <p className='mt-6'><span className='font-semibold'>Delivery address:</span> {currentOrder.deliveryAddress?.text}</p>
+                    </div>
+                    {shopOrder.status != "delivered" ? <>
+                        {shopOrder.assignedDeliveryBoy ?
+                            <div className='text-sm text-gray-700'>
+                                <p className='font-semibold'><span>Delivery Boy Name:</span> {shopOrder.assignedDeliveryBoy.fullName}</p>
+                                <p className='font-semibold'><span>Delivery Boy contact No.:</span> {shopOrder.assignedDeliveryBoy.mobile}</p>
+                            </div> : <p className='font-semibold'>Delivery Boy is not assigned yet.</p>}
+                    </> : <p className='font-bold text-lg text-green-600'>Delivered</p>}
+                    {shopOrder.assignedDeliveryBoy &&
+                        <div className='h-[400px] w-full rounded-2xl overflow-hidden shadow-md'>
+                            <DeliveryBoyTracking data={{
+                                deliveryBoyLocation: {
+                                    lat: shopOrder.assignedDeliveryBoy.location.coordinates[1],
+                                    lon: shopOrder.assignedDeliveryBoy.location.coordinates[0],
+                                },
+                                customerLocation: {
+                                    lat: currentOrder.deliveryAddress.latitude,
+                                    lon: currentOrder.deliveryAddress.longitude,
+                                }
+                            }} />
+                        </div>}
+                </div>
+            ))}
+        </div>
+    )
+}
+
+export default TrackOrderPage
