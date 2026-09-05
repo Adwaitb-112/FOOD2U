@@ -11,7 +11,9 @@ const userSlice = createSlice({
         itemsInMyCity: null,
         cartItems: [],
         totalAmount: 0,
-        myOrders: []
+        myOrders: [],
+        searchItems: null,
+        socket: null
     },
     reducers: {
         setUserData: (state, action) => {
@@ -61,6 +63,9 @@ const userSlice = createSlice({
         addMyOrders: (state, action) => {
             state.myOrders = [action.payload, ...state.myOrders]
         },
+        setSearchItems: (state, action) => {
+            state.searchItems = action.payload
+        },
         updateOrdersStatus: (state, action) => {
             const { orderId, shopId, status } = action.payload
             const order = state.myOrders.find(o => o._id == orderId)
@@ -69,9 +74,22 @@ const userSlice = createSlice({
                     order.shopOrders.status = status
                 }
             }
+        },
+        updateRealtimeOrdersStatus: (state, action) => {
+            const { orderId, shopId, status } = action.payload
+            const order = state.myOrders.find(o => o._id == orderId)
+            if (order) {
+                const shopOrder = order.shopOrders.find(so => so.shop._id == shopId)
+                if (shopOrder) {
+                    shopOrder.status = status
+                }
+            }
+        },
+        setSocket: (state, action) => {
+            state.socket = action.payload
         }
     }
 })
 
-export const { setUserData, setCurrentCity, setCurrentState, setCurrentAddress, setShopsInMyCity, setSItemsInMyCity, addToCart, updateQuantity, removeCartItem, setMyOrders, addMyOrders, updateOrdersStatus } = userSlice.actions
+export const { setUserData, setCurrentCity, setCurrentState, setCurrentAddress, setShopsInMyCity, setSItemsInMyCity, addToCart, updateQuantity, removeCartItem, setMyOrders, addMyOrders, updateOrdersStatus, setSearchItems, setSocket, updateRealtimeOrdersStatus } = userSlice.actions
 export default userSlice.reducer

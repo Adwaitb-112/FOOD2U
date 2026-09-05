@@ -26,7 +26,7 @@ function RecenterMap({ location }) {
 function CheckOut() {
 
     const { location, address } = useSelector(state => state.map)
-    const { cartItems, totalAmount } = useSelector(state => state.user)
+    const { cartItems, totalAmount, userData } = useSelector(state => state.user)
     const dispatch = useDispatch()
     const [addressInput, setAddressInput] = useState("")
     const [paymentMethod, setPaymentMethod] = useState("cod")
@@ -52,12 +52,10 @@ function CheckOut() {
     }
 
     const getCurrentLocation = () => {
-        navigator.geolocation.getCurrentPosition(async (position) => {
-            const latitude = position.coords.latitude
-            const longitude = position.coords.longitude
-            dispatch(setLocation({ lat: latitude, lon: longitude }))
-            getAddressByLatLng(latitude, longitude)
-        })
+        const latitude = userData.location.coordinates[1]
+        const longitude = userData.location.coordinates[0]
+        dispatch(setLocation({ lat: latitude, lon: longitude }))
+        getAddressByLatLng(latitude, longitude)
     }
 
     const getLatLngByAddress = async () => {
@@ -75,19 +73,51 @@ function CheckOut() {
             const res = await axios.post(`${serverUrl}/api/order/place-order`, {
                 cartItems,
                 paymentMethod,
-                totalAmount,
+                totalAmount: amountWithDeliveryFee,
                 deliveryAddress: {
                     text: addressInput,
                     latitude: location.lat,
                     longitude: location.lon
                 }
             }, { withCredentials: true })
-            // console.log(res.data)
-            dispatch(addMyOrders(res.data))
-            navigate("/order-placed")
+            if (paymentMethod == "cod") {
+                dispatch(addMyOrders(res.data))
+                navigate("/order-placed")
+            } else {
+                const orderId = res.data.orderId
+                const razorOrder = res.data.razorOrder
+                openRazorpayWindow(orderId, razorOrder)
+            }
+
         } catch (error) {
             console.log(error)
         }
+    }
+
+    const openRazorpayWindow = (orderId, razorOrder) => {
+        const options = {
+            key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+            amount: razorOrder.amount,
+            currency: "INR",
+            name: "Food2U",
+            description: "Food Delivery Website",
+            order_id: razorOrder.id,
+            handler: async function (response) {
+                try {
+                    const result = await axios.post(`${serverUrl}/api/order/verify-payment`, {
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        orderId
+                    }, { withCredentials: true })
+                    dispatch(addMyOrders(result.data))
+                    navigate("/order-placed")
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+        }
+
+        const rzp = new window.Razorpay(options)
+        rzp.open()
     }
 
     useEffect(() => {
@@ -96,7 +126,7 @@ function CheckOut() {
 
     return (
         <div className='min-h-screen bg-[#fff9f6] flex items-center justify-center p-6'>
-            <div className=' absolute top-[20px] left-[20px] z-[10]' onClick={() => navigate("/")}>
+            <div className=' absolute top-[20px] left-[20px] z-[10] cursor-pointer' onClick={() => navigate("/")}>
                 <MdArrowBackIos size={35} className='text-[#ff4d2d]' />
             </div>
             <div className='w-full max-w-[900px] bg-white rounded-2xl shadow-xl p-6 space-y-6'>

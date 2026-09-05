@@ -4,12 +4,13 @@ import { TfiSearch } from "react-icons/tfi";
 import { GrCart } from "react-icons/gr";
 import { useDispatch, useSelector } from 'react-redux'
 import { GiCrossMark } from "react-icons/gi";
-import { setUserData } from '../redux/userSlice';
+import { setSearchItems, setUserData } from '../redux/userSlice';
 import { serverUrl } from "../App.jsx"
 import { BsPlusCircleDotted } from "react-icons/bs";
 import { TbReceipt } from "react-icons/tb";
 import axios from "axios"
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 function Nav() {
 
@@ -17,6 +18,7 @@ function Nav() {
     const { myShopData } = useSelector(state => state.owner)
     const [showInfo, setShowInfo] = useState(false)
     const [showSearch, setShowSearch] = useState(false)
+    const [query, setQuery] = useState("")
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const { cartItems } = useSelector(state => state.user)
@@ -26,11 +28,29 @@ function Nav() {
         try {
             const result = await axios.get(`${serverUrl}/api/auth/signout`, { withCredentials: true })
             dispatch(setUserData(null))
-
         } catch (error) {
             console.log(error)
         }
     }
+
+    const handleLSearchItems = async () => {
+        try {
+            const result = await axios.get(`${serverUrl}/api/item/search-items?query=${query}&city=${currentCity}`, { withCredentials: true })
+            dispatch(setSearchItems(result.data))
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        if (query) {
+            handleLSearchItems()
+        }
+        else{
+            dispatch(setSearchItems(null))
+        }
+    }, [query])
+
 
     return (
         <div className='w-full h-[80px] flex items-center justify-between md:justify-center gap-[30px] px-[20px] fixed top-0 z-[9999] bg-[#fff9f6] overflow-visible'>
@@ -42,7 +62,7 @@ function Nav() {
                 </div>
                 <div className='w-[80%] flex items-center gap-[10px]'>
                     <TfiSearch size={25} className='text-[#ff4d2d]' />
-                    <input type="text" placeholder='Search food...' className='px-[10px] text-gray-700 outline-0 w-full' />
+                    <input type="text" placeholder='Search food...' className='px-[10px] text-gray-700 outline-0 w-full' onChange={(e) => setQuery(e.target.value)} value={query} />
                 </div>
             </div>}
 
@@ -54,7 +74,7 @@ function Nav() {
                 </div>
                 <div className='w-[80%] flex items-center gap-[10px]'>
                     <TfiSearch className='text-[#ff4d2d]' size={25} />
-                    <input type="text" placeholder='Search food...' className='px-[10px] text-gray-700 outline-0 w-full' />
+                    <input type="text" placeholder='Search food...' className='px-[10px] text-gray-700 outline-0 w-full' onChange={(e) => setQuery(e.target.value)} value={query} />
                 </div>
             </div>}
 

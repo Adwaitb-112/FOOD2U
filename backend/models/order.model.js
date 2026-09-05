@@ -36,6 +36,18 @@ const shopOrderSchema = new mongoose.Schema({
     assignedDeliveryBoy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
+    },
+    deliveryOtp: {
+        type: String,
+        default: null
+    },
+    otpExpires: {
+        type: Date,
+        default: null
+    },
+    deliveredAt: {
+        type: Date,
+        default: null
     }
 
 }, { timestamps: true })
@@ -72,7 +84,19 @@ const orderSchema = new mongoose.Schema({
     totalAmount: {
         type: Number
     },
-    shopOrders: [shopOrderSchema]
+    shopOrders: [shopOrderSchema],
+    payment: {
+        type: Boolean,
+        default: false
+    },
+    razorpayOrderId: {
+        type: String,
+        default: ""
+    },
+    razorpayPaymentId: {
+        type: String,
+        default: ""
+    }
 
 }, { timestamps: true })
 
