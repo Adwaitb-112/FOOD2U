@@ -6,6 +6,7 @@ import { serverUrl } from '../App'
 import DeliveryBoyTracking from './DeliveryBoyTracking'
 import { ClipLoader } from 'react-spinners';
 import { useNavigate } from 'react-router-dom'
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
 function DeliveryBoy() {
 
@@ -18,6 +19,9 @@ function DeliveryBoy() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [otpSubmit, setOtpSubmit] = useState("")
+  const [todayDeliveries, setTodayDeliveries] = useState([])
+  const ratePerDelivery = 50
+  const totalEarning = todayDeliveries.reduce((sum, d) => sum + d.count * ratePerDelivery, 0)
 
   const getAssignment = async () => {
     try {
@@ -65,6 +69,15 @@ function DeliveryBoy() {
     }
   }
 
+  const handleTodayDeliveries = async () => {
+    try {
+      const result = await axios.get(`${serverUrl}/api/order/get-today-deliveries`, { withCredentials: true })
+      setTodayDeliveries(result.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   const handleSubmit = async (e) => {
     setLoading(true)
     try {
@@ -90,6 +103,7 @@ function DeliveryBoy() {
   useEffect(() => {
     getAssignment()
     getCurrentOrder()
+    handleTodayDeliveries()
   }, [userData])
 
   useEffect(() => {
@@ -138,6 +152,23 @@ function DeliveryBoy() {
         <div className='bg-white rounded-2xl shadow-md p-5 flex justify-center flex-col gap-2 items-center w-[90%] border text-center border-orange-100'>
           <h1 className='text-xl font-bold text-[#ff4d2d]'>Welcome, {userData.fullName}</h1>
           <p className='text-[#ff4d2d] '><span className='font-semibold'>Latitude:</span> {deliveryBoyLocation?.lat}, <span className='font-semibold'>Longitude:</span> {deliveryBoyLocation?.lon}</p>
+        </div>
+
+        <div className='bg-white rounded-2xl shadow-md p-5 w-[90%] mb-6 border border-orange-100'>
+          <h1 className='text-lg font-bold mb-3 text-[#ff4d2d]'>Today Deliveries</h1>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={todayDeliveries} >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="hour" tickFormatter={(h) => `${h}:00`} />
+              <YAxis allowDecimals={false} />
+              <Tooltip formatter={(value) => [value, "orders"]} labelFormatter={label => `${label}:00`} />
+              <Bar dataKey="count" fill='#ff4d24' />
+            </BarChart>
+          </ResponsiveContainer>
+          <div className='max-w-sm mx-auto mt-6 p-6 bg-white rounded-2xl shadow-lg text-center'>
+            <h1 className='text-xl font-semibold text-gray-800 mb-2'>Today's Earning</h1>
+            <span className='text-3xl font-bold text-green-600'>₹{totalEarning}</span>
+          </div>
         </div>
 
         {!currentOrder &&

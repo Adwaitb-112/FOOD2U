@@ -54,7 +54,7 @@ function FoodCard({ data }) {
                 <h1 className='font-semibold text-gray-900 text-base truncate'>{data.name}</h1>
                 <div className='flex items-center gap-1 mt-1'>
                     {renderStars(data.rating?.average || 0)}
-                    <span className='text-xs text-gray-500'>{data.count || 0}</span>
+                    <span className='text-xs text-gray-500'>{data.rating?.count || 0}</span>
                 </div>
             </div>
 

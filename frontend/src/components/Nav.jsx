@@ -14,15 +14,13 @@ import { useEffect } from 'react';
 
 function Nav() {
 
-    const { userData, currentCity } = useSelector(state => state.user)
+    const { userData, currentCity, cartItems } = useSelector(state => state.user)
     const { myShopData } = useSelector(state => state.owner)
     const [showInfo, setShowInfo] = useState(false)
     const [showSearch, setShowSearch] = useState(false)
     const [query, setQuery] = useState("")
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    const { cartItems } = useSelector(state => state.user)
-
 
     const handleLogOut = async () => {
         try {
@@ -46,7 +44,7 @@ function Nav() {
         if (query) {
             handleLSearchItems()
         }
-        else{
+        else {
             dispatch(setSearchItems(null))
         }
     }, [query])
@@ -94,7 +92,6 @@ function Nav() {
                     <div className='hidden md:flex items-center gap-2 cursor-pointer relative px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] font-medium' onClick={() => navigate("/my-order")}>
                         <TbReceipt size={20} />
                         <span>My orders</span>
-                        <span className='absolute -right-2 -top-2 text-xs font-bold text-white bg-[#ff4d2d] rounded-full px-[6px] py-[1px]'>0</span>
                     </div>
                     <div className='md:hidden flex items-center gap-2 cursor-pointer relative px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] font-medium' onClick={() => navigate("/my-order")}>
                         <TbReceipt size={20} />
